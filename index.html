@@ -10,132 +10,127 @@
         .screen { width: 800px; height: 550px; border: 4px solid #fff; position: relative; overflow: hidden; }
         .hidden { display: none !important; }
 
+        /* --- NEWS BANNER --- */
+        #news-banner {
+            position: absolute; top: 0; width: 100%; height: 25px; background: rgba(255, 0, 0, 0.7);
+            z-index: 100; overflow: hidden; white-space: nowrap; line-height: 25px; font-size: 14px; font-weight: bold;
+        }
+        #news-text { display: inline-block; padding-left: 100%; animation: scroll-news 15s linear infinite; }
+        @keyframes scroll-news { 0% { transform: translateX(0); } 100% { transform: translateX(-150%); } }
+
         /* --- START MENU UI --- */
         #menu-bg { position: absolute; inset: 0; z-index: 1; background: linear-gradient(#0a0a2e, #16213e); }
         
-        /* Backpack Button (Left Corner - 5cm approx) */
-        #btn-backpack { 
-            position: absolute; left: 40px; top: 40px; width: 110px; height: 90px; 
-            z-index: 10; cursor: pointer; text-align: center;
-        }
+        /* Backpack Button (Left Corner - 5cm away) */
+        #btn-backpack { position: absolute; left: 45px; top: 50px; width: 110px; height: 90px; z-index: 10; cursor: pointer; text-align: center; }
         .backpack-pixel {
-            width: 54px; height: 44px; background: #b35900; margin: 0 auto 5px;
+            width: 50px; height: 40px; background: #b35900; margin: 0 auto 5px;
             border: 4px solid #000; position: relative; border-radius: 4px;
         }
-        /* Backpack Straps & Flap */
-        .backpack-pixel::before { content: ''; position: absolute; top: -8px; left: 10px; width: 26px; height: 8px; border: 4px solid #000; border-bottom: none; border-radius: 5px 5px 0 0; }
-        .backpack-pixel::after { content: ''; position: absolute; top: 10px; left: 8px; width: 30px; height: 15px; background: #8b4513; border: 3px solid #000; }
+        .backpack-pixel::after { content: ''; position: absolute; top: 8px; left: 6px; width: 30px; height: 12px; background: #8b4513; border: 3px solid #000; }
 
-        /* Quest Button (Right Corner - 5cm approx) */
+        /* Quest Button (Right Corner - 5cm away) */
         #btn-quest { 
-            position: absolute; right: 40px; top: 40px; width: 140px; height: 45px; 
+            position: absolute; right: 45px; top: 50px; width: 140px; height: 40px; 
             z-index: 10; cursor: pointer; background: var(--paper); color: var(--wood);
             border: 3px solid var(--wood); border-radius: 20px 20px 5px 5px; font-weight: bold;
-            display: flex; align-items: center; justify-content: center; box-shadow: 0 4px #8b4513;
+            display: flex; align-items: center; justify-content: center;
         }
-
-        /* Play Button (Bottom) */
-        #btn-play { 
-            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); 
-            width: 120px; height: 70px; z-index: 10; cursor: pointer;
-            background: #2ecc71; border: 4px solid #fff; font-size: 40px; color: white;
-            border-radius: 10px; transition: 0.1s;
-        }
-        #btn-play:active { transform: translateX(-50%) translateY(4px); }
 
         /* Quest Scroll Rollout */
         #quest-scroll { 
-            position: absolute; top: 95px; right: 40px; width: 230px; height: 0; 
+            position: absolute; top: 90px; right: 45px; width: 230px; height: 0; 
             background: var(--paper); color: #5d4037; overflow: hidden; 
             transition: height 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
             border-left: 3px solid var(--wood); border-right: 3px solid var(--wood); z-index: 9;
         }
-        #quest-scroll.open { height: 190px; padding: 15px; border-bottom: 8px solid var(--wood); }
+        #quest-scroll.open { height: 180px; padding: 15px; border-bottom: 8px solid var(--wood); }
 
-        /* HUD */
-        #hud { position: absolute; bottom: 0; width: 100%; height: 50px; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: space-around; z-index: 50; border-top: 2px solid #fff; }
+        /* Play Button (Bottom) */
+        #btn-play { 
+            position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); 
+            width: 110px; height: 70px; z-index: 10; cursor: pointer;
+            background: #2ecc71; border: 4px solid #fff; font-size: 40px; color: white; border-radius: 10px;
+        }
     </style>
 </head>
 <body>
 
     <div class="screen">
+        <div id="news-banner"><div id="news-text">🚨 NEW UPDATE: SOUL DAGGERS ADDED! • GRIND FOR THE UNO REVERSE CARD! • PARKOUR MAP LIVE! 🚨</div></div>
+
         <div id="menu-container">
             <canvas id="menu-bg"></canvas>
             
-            <div id="btn-backpack" onclick="showStats()">
+            <div id="btn-backpack" onclick="alert('STATS: ' + stats.wins + ' Wins')">
                 <div class="backpack-pixel"></div>
-                <span style="font-size: 11px; font-weight: bold; letter-spacing: 1px;">BACKPACK</span>
+                <span style="font-size: 11px; font-weight: bold;">BACKPACK</span>
             </div>
 
             <div id="btn-quest" onclick="toggleQuest()">📜 QUEST</div>
             <div id="quest-scroll">
-                <b style="font-size: 16px; text-decoration: underline;">Distortion Missions</b><br><br>
-                <small>• 🏆 Win 10 games (UNO Card)</small><br>
-                <small>• ⚔️ Stun 20 times (Daggers)</small><br>
-                <small>• 🔥 Escape the Void!</small>
+                <b>DISTORTION TASKS:</b><br><br>
+                <small>• 🏆 10 Wins: Unlock UNO</small><br>
+                <small>• ⚔️ 20 Stuns: Unlock DAGGERS</small>
             </div>
 
             <button id="btn-play" onclick="openModeSelect()">▶</button>
         </div>
 
-        <div id="mode-select" class="overlay hidden">...</div>
-        <div id="wep-select" class="overlay hidden">...</div>
-        <div id="game-view" class="hidden">...</div>
+        <div id="mode-select" class="overlay hidden" style="position:absolute; inset:0; background:rgba(0,0,0,0.9); z-index:200; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+            <h1>SELECT MODE</h1>
+            <button onclick="pickMode('ai')">VS AI</button>
+            <button onclick="pickMode('multi')">MULTIPLAYER</button>
+        </div>
     </div>
 
     <script>
         let stats = JSON.parse(localStorage.getItem('shibaStats')) || { wins: 0, stuns: 0 };
         const bg = document.getElementById('menu-bg');
         const btx = bg.getContext('2d');
-        let eyePulse = 0;
-        let shibaY = 250;
+        bg.width = 800; bg.height = 550;
+        let frame = 0;
 
-        function drawMenuArt() {
+        function drawMenu() {
             btx.clearRect(0,0,800,550);
-            
-            // Sky & Stars
             btx.fillStyle = "#0a0a2e"; btx.fillRect(0,0,800,550);
-            
-            // Giratina (Distortion King)
+
+            // Giratina Silhouette
             btx.fillStyle = "#1a1a1a";
             btx.beginPath();
-            btx.moveTo(400, 50); btx.lineTo(100, 600); btx.lineTo(700, 600);
+            btx.moveTo(400, 80); btx.lineTo(150, 600); btx.lineTo(650, 600);
             btx.fill();
-            
-            // Pulsing Red Eyes
-            eyePulse += 0.05;
-            let opacity = Math.abs(Math.sin(eyePulse));
-            btx.fillStyle = `rgba(255, 0, 0, ${opacity})`;
-            btx.fillRect(370, 140, 15, 8); // Left Eye
-            btx.fillRect(415, 140, 15, 8); // Right Eye
-            btx.shadowBlur = 15; btx.shadowColor = "red";
-            btx.fillRect(370, 140, 15, 8); btx.fillRect(415, 140, 15, 8);
+
+            // PULSING RED EYES
+            frame += 0.05;
+            let eyeGlow = Math.abs(Math.sin(frame));
+            btx.shadowBlur = 15 * eyeGlow;
+            btx.shadowColor = "red";
+            btx.fillStyle = `rgba(255, 0, 0, ${eyeGlow})`;
+            btx.fillRect(375, 180, 12, 6); btx.fillRect(413, 180, 12, 6);
             btx.shadowBlur = 0;
 
-            // Flying Shiba Animation
-            shibaY = 250 + Math.sin(eyePulse * 0.5) * 20;
+            // FLYING SHIBA
+            let shibaY = 280 + Math.sin(frame * 0.5) * 25;
             drawShiba(380, shibaY);
 
-            requestAnimationFrame(drawMenuArt);
+            requestAnimationFrame(drawMenu);
         }
 
         function drawShiba(x, y) {
-            // Body
-            btx.fillStyle = "#E19A4E"; btx.fillRect(x, y, 40, 30);
-            // White Fur
-            btx.fillStyle = "white"; btx.fillRect(x, y+15, 15, 15);
-            // Ears
-            btx.fillStyle = "#E19A4E";
-            btx.beginPath(); btx.moveTo(x, y); btx.lineTo(x+10, y); btx.lineTo(x, y-10); btx.fill();
-            btx.beginPath(); btx.moveTo(x+40, y); btx.lineTo(x+30, y); btx.lineTo(x+40, y-10); btx.fill();
-            // Eye
-            btx.fillStyle = "black"; btx.fillRect(x+30, y+8, 4, 4);
+            btx.fillStyle = "#E19A4E"; btx.fillRect(x, y, 40, 28); // Body
+            btx.fillStyle = "white"; btx.fillRect(x, y+14, 12, 14); // Belly
+            btx.fillStyle = "#E19A4E"; // Ears
+            btx.beginPath(); btx.moveTo(x,y); btx.lineTo(x+10,y); btx.lineTo(x,y-10); btx.fill();
+            btx.beginPath(); btx.moveTo(x+40,y); btx.lineTo(x+30,y); btx.lineTo(x+40,y-10); btx.fill();
+            btx.fillStyle = "black"; btx.fillRect(x+30, y+8, 4, 4); // Eye
         }
 
         function toggleQuest() { document.getElementById('quest-scroll').classList.toggle('open'); }
-        function showStats() { alert(`INVENTORY:\nWins: ${stats.wins}\nStuns: ${stats.stuns}`); }
-        
-        drawMenuArt();
+        function openModeSelect() { document.getElementById('mode-select').classList.remove('hidden'); }
+        function pickMode(m) { alert("Starting " + m + " mode! Choose weapon next..."); }
+
+        drawMenu();
     </script>
 </body>
 </html>
