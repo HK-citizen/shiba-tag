@@ -13,50 +13,47 @@
         /* --- START MENU UI --- */
         #menu-bg { position: absolute; inset: 0; z-index: 1; background: linear-gradient(#0a0a2e, #16213e); }
         
-        /* Backpack Button (Left Corner) */
+        /* Backpack Button (Left Corner - 5cm approx) */
         #btn-backpack { 
-            position: absolute; left: 40px; top: 40px; width: 100px; height: 80px; 
+            position: absolute; left: 40px; top: 40px; width: 110px; height: 90px; 
             z-index: 10; cursor: pointer; text-align: center;
         }
         .backpack-pixel {
-            width: 50px; height: 50px; background: #b35900; margin: 0 auto 5px;
-            border: 3px solid #000; position: relative;
+            width: 54px; height: 44px; background: #b35900; margin: 0 auto 5px;
+            border: 4px solid #000; position: relative; border-radius: 4px;
         }
-        .backpack-pixel::after { content: ''; position: absolute; top: 10px; left: 5px; width: 34px; height: 20px; border: 3px solid #000; background: #cd853f; }
+        /* Backpack Straps & Flap */
+        .backpack-pixel::before { content: ''; position: absolute; top: -8px; left: 10px; width: 26px; height: 8px; border: 4px solid #000; border-bottom: none; border-radius: 5px 5px 0 0; }
+        .backpack-pixel::after { content: ''; position: absolute; top: 10px; left: 8px; width: 30px; height: 15px; background: #8b4513; border: 3px solid #000; }
 
-        /* Quest Button (Right Corner) */
+        /* Quest Button (Right Corner - 5cm approx) */
         #btn-quest { 
             position: absolute; right: 40px; top: 40px; width: 140px; height: 45px; 
             z-index: 10; cursor: pointer; background: var(--paper); color: var(--wood);
-            border: 3px solid var(--wood); border-radius: 5px; font-weight: bold;
-            display: flex; align-items: center; justify-content: center;
+            border: 3px solid var(--wood); border-radius: 20px 20px 5px 5px; font-weight: bold;
+            display: flex; align-items: center; justify-content: center; box-shadow: 0 4px #8b4513;
         }
 
         /* Play Button (Bottom) */
         #btn-play { 
             position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); 
-            width: 120px; height: 60px; z-index: 10; cursor: pointer;
-            background: #2ecc71; border: 4px solid #fff; font-size: 35px; color: white;
+            width: 120px; height: 70px; z-index: 10; cursor: pointer;
+            background: #2ecc71; border: 4px solid #fff; font-size: 40px; color: white;
+            border-radius: 10px; transition: 0.1s;
         }
+        #btn-play:active { transform: translateX(-50%) translateY(4px); }
 
         /* Quest Scroll Rollout */
         #quest-scroll { 
-            position: absolute; top: 95px; right: 40px; width: 220px; height: 0; 
+            position: absolute; top: 95px; right: 40px; width: 230px; height: 0; 
             background: var(--paper); color: #5d4037; overflow: hidden; 
             transition: height 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            border-left: 2px solid var(--wood); border-right: 2px solid var(--wood); z-index: 9;
+            border-left: 3px solid var(--wood); border-right: 3px solid var(--wood); z-index: 9;
         }
-        #quest-scroll.open { height: 180px; padding: 15px; border-bottom: 5px solid var(--wood); }
-
-        /* Overlays */
-        .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .wep-grid { display: flex; gap: 15px; }
-        .item-slot { width: 90px; padding: 15px; border: 3px solid #555; background: #222; cursor: pointer; text-align: center; }
-        .selected { border-color: var(--gold); background: #333; }
-        .locked { opacity: 0.3; cursor: not-allowed; }
+        #quest-scroll.open { height: 190px; padding: 15px; border-bottom: 8px solid var(--wood); }
 
         /* HUD */
-        #hud { position: absolute; bottom: 0; width: 100%; height: 50px; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: space-around; z-index: 50; }
+        #hud { position: absolute; bottom: 0; width: 100%; height: 50px; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: space-around; z-index: 50; border-top: 2px solid #fff; }
     </style>
 </head>
 <body>
@@ -67,93 +64,78 @@
             
             <div id="btn-backpack" onclick="showStats()">
                 <div class="backpack-pixel"></div>
-                <span style="font-size: 10px; font-weight: bold;">BACKPACK</span>
+                <span style="font-size: 11px; font-weight: bold; letter-spacing: 1px;">BACKPACK</span>
             </div>
 
-            <div id="btn-quest" onclick="toggleQuest()">
-                📜 QUEST
-            </div>
+            <div id="btn-quest" onclick="toggleQuest()">📜 QUEST</div>
             <div id="quest-scroll">
-                <b style="color: #8b4513;">CURRENT QUESTS:</b><br>
-                <small>• Win 10 games to unlock UNO Reverse Card</small><br><br>
-                <small>• Stun 20 times for the Soul Daggers</small>
+                <b style="font-size: 16px; text-decoration: underline;">Distortion Missions</b><br><br>
+                <small>• 🏆 Win 10 games (UNO Card)</small><br>
+                <small>• ⚔️ Stun 20 times (Daggers)</small><br>
+                <small>• 🔥 Escape the Void!</small>
             </div>
 
             <button id="btn-play" onclick="openModeSelect()">▶</button>
         </div>
 
-        <div id="mode-select" class="overlay hidden">
-            <h1>SELECT MODE</h1>
-            <button onclick="pickMode('ai')">VS AI</button>
-            <button onclick="pickMode('multi')">MULTIPLAYER</button>
-        </div>
-
-        <div id="wep-select" class="overlay hidden">
-            <h1>CHOOSE WEAPON</h1>
-            <div class="wep-grid">
-                <div class="item-slot selected" onclick="setWep('none', this)">PAWS</div>
-                <div id="uno-lock" class="item-slot locked" onclick="setWep('uno', this)">UNO</div>
-                <div id="dag-lock" class="item-slot locked" onclick="setWep('dagger', this)">DAGGERS</div>
-            </div>
-            <button style="margin-top:20px" onclick="startTheGame()">START BATTLE</button>
-        </div>
-
-        <div id="game-view" class="hidden">
-            <canvas id="gameCanvas" width="800" height="500"></canvas>
-            <div id="hud">
-                <b id="timer-txt">03:00</b>
-                <b id="tag-txt" style="color:red;">YOU ARE IT!</b>
-                <span style="font-size: 10px;">[Enter] Chat</span>
-            </div>
-        </div>
+        <div id="mode-select" class="overlay hidden">...</div>
+        <div id="wep-select" class="overlay hidden">...</div>
+        <div id="game-view" class="hidden">...</div>
     </div>
 
     <script>
         let stats = JSON.parse(localStorage.getItem('shibaStats')) || { wins: 0, stuns: 0 };
-        let currentWep = 'none';
-
-        // --- MENU ART ---
         const bg = document.getElementById('menu-bg');
         const btx = bg.getContext('2d');
-        function drawBG() {
+        let eyePulse = 0;
+        let shibaY = 250;
+
+        function drawMenuArt() {
+            btx.clearRect(0,0,800,550);
+            
+            // Sky & Stars
             btx.fillStyle = "#0a0a2e"; btx.fillRect(0,0,800,550);
-            // Giratina Silhouette
-            btx.fillStyle = "#1a0033";
-            btx.beginPath(); btx.moveTo(400,100); btx.lineTo(100,550); btx.lineTo(700,550); btx.fill();
-            // Flying Shiba
-            btx.fillStyle = "#E19A4E"; btx.fillRect(380, 250, 40, 30);
-            btx.fillStyle = "white"; btx.fillRect(385, 265, 10, 10);
-            requestAnimationFrame(drawBG);
-        }
-        drawBG();
+            
+            // Giratina (Distortion King)
+            btx.fillStyle = "#1a1a1a";
+            btx.beginPath();
+            btx.moveTo(400, 50); btx.lineTo(100, 600); btx.lineTo(700, 600);
+            btx.fill();
+            
+            // Pulsing Red Eyes
+            eyePulse += 0.05;
+            let opacity = Math.abs(Math.sin(eyePulse));
+            btx.fillStyle = `rgba(255, 0, 0, ${opacity})`;
+            btx.fillRect(370, 140, 15, 8); // Left Eye
+            btx.fillRect(415, 140, 15, 8); // Right Eye
+            btx.shadowBlur = 15; btx.shadowColor = "red";
+            btx.fillRect(370, 140, 15, 8); btx.fillRect(415, 140, 15, 8);
+            btx.shadowBlur = 0;
 
-        // --- UI LOGIC ---
+            // Flying Shiba Animation
+            shibaY = 250 + Math.sin(eyePulse * 0.5) * 20;
+            drawShiba(380, shibaY);
+
+            requestAnimationFrame(drawMenuArt);
+        }
+
+        function drawShiba(x, y) {
+            // Body
+            btx.fillStyle = "#E19A4E"; btx.fillRect(x, y, 40, 30);
+            // White Fur
+            btx.fillStyle = "white"; btx.fillRect(x, y+15, 15, 15);
+            // Ears
+            btx.fillStyle = "#E19A4E";
+            btx.beginPath(); btx.moveTo(x, y); btx.lineTo(x+10, y); btx.lineTo(x, y-10); btx.fill();
+            btx.beginPath(); btx.moveTo(x+40, y); btx.lineTo(x+30, y); btx.lineTo(x+40, y-10); btx.fill();
+            // Eye
+            btx.fillStyle = "black"; btx.fillRect(x+30, y+8, 4, 4);
+        }
+
         function toggleQuest() { document.getElementById('quest-scroll').classList.toggle('open'); }
-        function showStats() { alert(`WINS: ${stats.wins}\nSTUNS: ${stats.stuns}`); }
+        function showStats() { alert(`INVENTORY:\nWins: ${stats.wins}\nStuns: ${stats.stuns}`); }
         
-        function openModeSelect() { document.getElementById('mode-select').classList.remove('hidden'); }
-        
-        function pickMode(mode) {
-            document.getElementById('mode-select').classList.add('hidden');
-            document.getElementById('wep-select').classList.remove('hidden');
-            // Unlock check
-            if(stats.wins >= 10) document.getElementById('uno-lock').classList.remove('locked');
-            if(stats.stuns >= 20) document.getElementById('dag-lock').classList.remove('locked');
-        }
-
-        function setWep(w, el) {
-            if(el.classList.contains('locked')) return;
-            currentWep = w;
-            document.querySelectorAll('.item-slot').forEach(s => s.classList.remove('selected'));
-            el.classList.add('selected');
-        }
-
-        function startTheGame() {
-            document.getElementById('wep-select').classList.add('hidden');
-            document.getElementById('menu-container').classList.add('hidden');
-            document.getElementById('game-view').classList.remove('hidden');
-            // Trigger your game loop here!
-        }
+        drawMenuArt();
     </script>
 </body>
 </html>
