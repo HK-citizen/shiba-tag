@@ -2,246 +2,158 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Shiba Tag: Ultimate Arsenal</title>
+    <title>Shiba Tag: Master Edition</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
-        :root { --shiba: #E19A4E; --dark: #1a1a2e; --gold: #f1c40f; --ghost: #8800ff; }
-        body { margin: 0; background: var(--dark); display: flex; align-items: center; justify-content: center; height: 100vh; color: #fff; font-family: 'Courier New', Courier, monospace; overflow: hidden; flex-direction: column; }
-        .screen { width: 800px; height: 550px; background: #222; border: 4px solid #fff; display: flex; flex-direction: column; align-items: center; padding: 20px; box-sizing: border-box; position: relative; }
+        :root { --gold: #f1c40f; --ghost: #8800ff; --paper: #f3e5ab; --wood: #8b4513; }
+        body { margin: 0; background: #000; display: flex; align-items: center; justify-content: center; height: 100vh; color: #fff; font-family: 'Courier New', Courier, monospace; overflow: hidden; }
+        .screen { width: 800px; height: 550px; border: 4px solid #fff; position: relative; overflow: hidden; }
         .hidden { display: none !important; }
-        canvas { background: #add8e6; border: 4px solid #2e7d32; image-rendering: pixelated; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-        .hud { width: 800px; display: flex; justify-content: space-around; background: rgba(0,0,0,0.9); padding: 12px; border: 2px solid #fff; border-top: none; box-sizing: border-box; }
-        #chat-box { position: absolute; bottom: 80px; left: 10px; width: 220px; height: 120px; background: rgba(0,0,0,0.7); border: 1px solid #555; display: flex; flex-direction: column; pointer-events: none; }
-        #chat-msgs { flex: 1; overflow-y: auto; padding: 5px; font-size: 11px; color: #00ff00; }
-        #chat-input { background: #000; border: none; color: white; padding: 5px; outline: none; display: none; pointer-events: auto; }
-        button { background: #2ecc71; color: white; border: none; padding: 12px 24px; cursor: pointer; font-family: inherit; font-weight: bold; margin: 5px; }
-        .item-slot { width: 110px; padding: 10px; border: 2px solid #555; cursor: pointer; margin: 5px; text-align: center; background: #333; }
-        .selected { border-color: var(--gold); box-shadow: 0 0 10px var(--gold); }
+
+        /* --- START MENU UI --- */
+        #menu-bg { position: absolute; inset: 0; z-index: 1; background: linear-gradient(#0a0a2e, #16213e); }
+        
+        /* Backpack Button (Left Corner) */
+        #btn-backpack { 
+            position: absolute; left: 40px; top: 40px; width: 100px; height: 80px; 
+            z-index: 10; cursor: pointer; text-align: center;
+        }
+        .backpack-pixel {
+            width: 50px; height: 50px; background: #b35900; margin: 0 auto 5px;
+            border: 3px solid #000; position: relative;
+        }
+        .backpack-pixel::after { content: ''; position: absolute; top: 10px; left: 5px; width: 34px; height: 20px; border: 3px solid #000; background: #cd853f; }
+
+        /* Quest Button (Right Corner) */
+        #btn-quest { 
+            position: absolute; right: 40px; top: 40px; width: 140px; height: 45px; 
+            z-index: 10; cursor: pointer; background: var(--paper); color: var(--wood);
+            border: 3px solid var(--wood); border-radius: 5px; font-weight: bold;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* Play Button (Bottom) */
+        #btn-play { 
+            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); 
+            width: 120px; height: 60px; z-index: 10; cursor: pointer;
+            background: #2ecc71; border: 4px solid #fff; font-size: 35px; color: white;
+        }
+
+        /* Quest Scroll Rollout */
+        #quest-scroll { 
+            position: absolute; top: 95px; right: 40px; width: 220px; height: 0; 
+            background: var(--paper); color: #5d4037; overflow: hidden; 
+            transition: height 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            border-left: 2px solid var(--wood); border-right: 2px solid var(--wood); z-index: 9;
+        }
+        #quest-scroll.open { height: 180px; padding: 15px; border-bottom: 5px solid var(--wood); }
+
+        /* Overlays */
+        .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .wep-grid { display: flex; gap: 15px; }
+        .item-slot { width: 90px; padding: 15px; border: 3px solid #555; background: #222; cursor: pointer; text-align: center; }
+        .selected { border-color: var(--gold); background: #333; }
         .locked { opacity: 0.3; cursor: not-allowed; }
-        #cutscene { position: absolute; inset: 0; background: rgba(0,0,0,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; color: var(--ghost); font-size: 50px; text-shadow: 0 0 20px var(--ghost); }
+
+        /* HUD */
+        #hud { position: absolute; bottom: 0; width: 100%; height: 50px; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: space-around; z-index: 50; }
     </style>
 </head>
 <body>
 
-    <div id="lobby-screen" class="screen">
-        <h1 style="color:var(--gold)">SHIBA TAG: MULTIVERSE</h1>
-        <input type="text" id="user-name" placeholder="YOUR NAME" maxlength="10">
-        <div style="margin: 20px;">
-            <button onclick="startSolo()">SOLO VS AI</button>
-            <button onclick="hostMulti()" style="background:var(--ghost)">HOST MULTIPLAYER</button>
-        </div>
-        <div>
-            <input type="text" id="join-code" placeholder="4-DIGIT CODE">
-            <button onclick="joinMulti()">JOIN ROOM</button>
-        </div>
-        <div id="wait-area" class="hidden">
-            <p>CODE: <b id="code-display" style="color:var(--gold)">----</b></p>
-            <button onclick="goToInventory()">CONTINUE</button>
-        </div>
-    </div>
+    <div class="screen">
+        <div id="menu-container">
+            <canvas id="menu-bg"></canvas>
+            
+            <div id="btn-backpack" onclick="showStats()">
+                <div class="backpack-pixel"></div>
+                <span style="font-size: 10px; font-weight: bold;">BACKPACK</span>
+            </div>
 
-    <div id="inventory-screen" class="screen hidden">
-        <h2>EQUIP YOUR GEAR</h2>
-        <div style="display:flex;">
-            <div class="item-slot selected" onclick="selectWeapon('none', this)">PAWS</div>
-            <div id="uno-slot" class="item-slot locked" onclick="selectWeapon('uno', this)">UNO CARD<br><small>10 WINS</small></div>
-            <div id="dagger-slot" class="item-slot locked" onclick="selectWeapon('dagger', this)">SOUL DAGGERS<br><small>20 STUNS</small></div>
-        </div>
-        <button onclick="initGame()" style="margin-top:20px; padding: 15px 40px;">BATTLE!</button>
-        <p>Wins: <span id="win-txt">0</span> | Stuns: <span id="stun-txt">0</span></p>
-    </div>
+            <div id="btn-quest" onclick="toggleQuest()">
+                📜 QUEST
+            </div>
+            <div id="quest-scroll">
+                <b style="color: #8b4513;">CURRENT QUESTS:</b><br>
+                <small>• Win 10 games to unlock UNO Reverse Card</small><br><br>
+                <small>• Stun 20 times for the Soul Daggers</small>
+            </div>
 
-    <div id="game-container" class="hidden">
-        <div id="cutscene">DOMAIN EXPANSION</div>
-        <div id="game-over" style="position:absolute; inset:0; background:rgba(0,0,0,0.9); display:none; flex-direction:column; align-items:center; justify-content:center; z-index:1000;">
-            <h1 id="res-title" style="font-size:48px;">TIME'S UP</h1>
-            <button onclick="location.reload()">BACK TO MENU</button>
+            <button id="btn-play" onclick="openModeSelect()">▶</button>
         </div>
-        <canvas id="gameCanvas"></canvas>
-        <div id="chat-box"><div id="chat-msgs"></div><input type="text" id="chat-input" maxlength="40"></div>
-        <div class="hud">
-            <div id="timer" style="color:#ff4757; font-weight:bold;">03:00</div>
-            <div id="tag-status">IT</div>
-            <div>[1] Uno | [R] Daggers | [X] Ultimate</div>
+
+        <div id="mode-select" class="overlay hidden">
+            <h1>SELECT MODE</h1>
+            <button onclick="pickMode('ai')">VS AI</button>
+            <button onclick="pickMode('multi')">MULTIPLAYER</button>
+        </div>
+
+        <div id="wep-select" class="overlay hidden">
+            <h1>CHOOSE WEAPON</h1>
+            <div class="wep-grid">
+                <div class="item-slot selected" onclick="setWep('none', this)">PAWS</div>
+                <div id="uno-lock" class="item-slot locked" onclick="setWep('uno', this)">UNO</div>
+                <div id="dag-lock" class="item-slot locked" onclick="setWep('dagger', this)">DAGGERS</div>
+            </div>
+            <button style="margin-top:20px" onclick="startTheGame()">START BATTLE</button>
+        </div>
+
+        <div id="game-view" class="hidden">
+            <canvas id="gameCanvas" width="800" height="500"></canvas>
+            <div id="hud">
+                <b id="timer-txt">03:00</b>
+                <b id="tag-txt" style="color:red;">YOU ARE IT!</b>
+                <span style="font-size: 10px;">[Enter] Chat</span>
+            </div>
         </div>
     </div>
 
     <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = 800; canvas.height = 500;
-
         let stats = JSON.parse(localStorage.getItem('shibaStats')) || { wins: 0, stuns: 0 };
-        let p1 = { x: 100, y: 435, dx: 0, dy: 0, isIt: true, weapon: 'none', unoActive: 0, ammo: 15, grounded: true };
-        let p2 = { x: 600, y: 435, dx: 0, dy: 0, isIt: false, isAI: true, stunned: 0, lastTag: 0 };
-        let projectiles = [], keys = {}, gameActive = false, timer = 180, isCutscene = false;
-        let peer, conn, myName = "Player";
+        let currentWep = 'none';
 
-        // --- CONTROLS ---
-        window.addEventListener('keydown', e => {
-            keys[e.code] = true;
-            if(!gameActive) return;
-            if(e.code === 'Enter') handleChat();
-            if(e.code === 'Digit1' && p1.weapon === 'uno') p1.unoActive = 120;
-            if(e.code === 'KeyR' && p1.weapon === 'dagger' && p1.ammo > 0) {
-                projectiles.push({x: p1.x + 15, y: p1.y + 10, dx: p1.dx >= 0 ? 10 : -10});
-                p1.ammo--;
-            }
-            if(e.code === 'KeyX' && p1.isIt && p1.weapon === 'dagger') launchDomain();
-        });
-        window.addEventListener('keyup', e => keys[e.code] = false);
+        // --- MENU ART ---
+        const bg = document.getElementById('menu-bg');
+        const btx = bg.getContext('2d');
+        function drawBG() {
+            btx.fillStyle = "#0a0a2e"; btx.fillRect(0,0,800,550);
+            // Giratina Silhouette
+            btx.fillStyle = "#1a0033";
+            btx.beginPath(); btx.moveTo(400,100); btx.lineTo(100,550); btx.lineTo(700,550); btx.fill();
+            // Flying Shiba
+            btx.fillStyle = "#E19A4E"; btx.fillRect(380, 250, 40, 30);
+            btx.fillStyle = "white"; btx.fillRect(385, 265, 10, 10);
+            requestAnimationFrame(drawBG);
+        }
+        drawBG();
 
-        // --- WEAPONS & ULTIMATE ---
-        function launchDomain() {
-            isCutscene = true;
-            const cs = document.getElementById('cutscene');
-            cs.style.display = 'flex';
-            setTimeout(() => {
-                cs.style.display = 'none';
-                isCutscene = false;
-                p1.isIt = false; p2.isIt = true; p2.stunned = 300; // 5s stun
-                if(conn) conn.send({type:'sync', isIt: false});
-            }, 2000);
+        // --- UI LOGIC ---
+        function toggleQuest() { document.getElementById('quest-scroll').classList.toggle('open'); }
+        function showStats() { alert(`WINS: ${stats.wins}\nSTUNS: ${stats.stuns}`); }
+        
+        function openModeSelect() { document.getElementById('mode-select').classList.remove('hidden'); }
+        
+        function pickMode(mode) {
+            document.getElementById('mode-select').classList.add('hidden');
+            document.getElementById('wep-select').classList.remove('hidden');
+            // Unlock check
+            if(stats.wins >= 10) document.getElementById('uno-lock').classList.remove('locked');
+            if(stats.stuns >= 20) document.getElementById('dag-lock').classList.remove('locked');
         }
 
-        function update() {
-            if(!gameActive || isCutscene) return;
-            ctx.clearRect(0,0,800,500);
-
-            // Ground
-            ctx.fillStyle = "#8B4513"; ctx.fillRect(0, 460, 800, 40);
-            ctx.fillStyle = "#2e7d32"; ctx.fillRect(0, 460, 800, 10);
-
-            // P1 Movement (Arrows + WASD)
-            if(keys['ArrowLeft'] || keys['KeyA']) p1.dx -= 0.8;
-            if(keys['ArrowRight'] || keys['KeyD']) p1.dx += 0.8;
-            if((keys['ArrowUp'] || keys['KeyW']) && p1.grounded) { p1.dy = -12; p1.grounded = false; }
-            if(keys['KeyQ']) p1.dx *= 1.4;
-
-            p1.x += p1.dx; p1.y += p1.dy; p1.dy += 0.5; p1.dx *= 0.8;
-            if(p1.y > 435) { p1.y = 435; p1.dy = 0; p1.grounded = true; }
-
-            // AI Logic
-            if(p2.isAI) {
-                if(p2.stunned > 0) p2.stunned--;
-                else {
-                    let diff = p1.x - p2.x;
-                    if(p2.isIt) p2.dx = diff > 0 ? 2.6 : -2.6;
-                    else p2.dx = diff > 0 ? -2.2 : 2.2;
-                    p2.x += p2.dx;
-                    if(p2.y > 435) { p2.y = 435; p2.dy = 0; }
-                }
-            }
-
-            // Projectiles
-            projectiles.forEach((proj, i) => {
-                proj.x += proj.dx;
-                ctx.fillStyle = varGhost; ctx.fillRect(proj.x, proj.y, 12, 4);
-                if(Math.hypot(proj.x - p2.x, proj.y - p2.y) < 30) {
-                    p2.stunned = 120; projectiles.splice(i, 1);
-                    stats.stuns++; saveStats();
-                }
-            });
-
-            // Tagging
-            let dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
-            if(dist < 35 && Date.now() - p2.lastTag > 1000) {
-                if(p1.unoActive > 0 && p2.isIt) { p2.stunned = 180; }
-                else if(p2.stunned <= 0) {
-                    p1.isIt = !p1.isIt; p2.isIt = !p2.isIt;
-                    p2.lastTag = Date.now();
-                }
-            }
-
-            // Uno Visual
-            if(p1.unoActive > 0) {
-                p1.unoActive--;
-                ctx.strokeStyle = "green"; ctx.lineWidth = 4;
-                ctx.strokeRect(p1.x-5, p1.y-5, 45, 35);
-            }
-
-            drawShiba(p1, "#E19A4E"); drawShiba(p2, "#3498db");
-            if(conn && !p2.isAI) conn.send({type:'sync', x:p1.x, y:p1.y, isIt:p1.isIt});
-            requestAnimationFrame(update);
-        }
-
-        function drawShiba(p, col) {
-            ctx.fillStyle = col; ctx.fillRect(p.x, p.y, 35, 25);
-            ctx.fillStyle = "white"; ctx.fillRect(p.x, p.y+12, 15, 13);
-            ctx.fillStyle = col; ctx.fillRect(p.x, p.y-7, 8, 8); ctx.fillRect(p.x+27, p.y-7, 8, 8);
-            ctx.fillStyle = "black"; ctx.fillRect(p.x+25, p.y+5, 4, 4);
-            if(p.isIt) { ctx.strokeStyle="red"; ctx.lineWidth=3; ctx.strokeRect(p.x-5,p.y-5,45,35); }
-        }
-
-        // --- LOBBY & PEERJS ---
-        function hostMulti() {
-            p2.isAI = false;
-            let code = Math.floor(1000 + Math.random() * 9000).toString();
-            peer = new Peer('shiba-' + code);
-            peer.on('open', () => {
-                document.getElementById('code-display').innerText = code;
-                document.getElementById('wait-area').classList.remove('hidden');
-            });
-            peer.on('connection', c => { conn = c; setupConn(); });
-        }
-
-        function joinMulti() {
-            p2.isAI = false;
-            let code = document.getElementById('join-code').value;
-            peer = new Peer();
-            peer.on('open', () => {
-                conn = peer.connect('shiba-' + code);
-                setupConn(); goToInventory();
-            });
-        }
-
-        function setupConn() {
-            conn.on('data', data => {
-                if(data.type === 'chat') addMsg(data.name, data.msg);
-                if(data.type === 'sync') { p2.x = data.x; p2.y = data.y; p2.isIt = data.isIt; }
-            });
-        }
-
-        function startSolo() { p2.isAI = true; goToInventory(); }
-        function goToInventory() {
-            document.getElementById('win-txt').innerText = stats.wins;
-            document.getElementById('stun-txt').innerText = stats.stuns;
-            if(stats.wins >= 10) document.getElementById('uno-slot').classList.remove('locked');
-            if(stats.stuns >= 20) document.getElementById('dagger-slot').classList.remove('locked');
-            document.getElementById('lobby-screen').classList.add('hidden');
-            document.getElementById('inventory-screen').classList.remove('hidden');
-        }
-
-        function selectWeapon(w, el) {
+        function setWep(w, el) {
             if(el.classList.contains('locked')) return;
-            p1.weapon = w;
+            currentWep = w;
             document.querySelectorAll('.item-slot').forEach(s => s.classList.remove('selected'));
             el.classList.add('selected');
         }
 
-        function initGame() {
-            document.getElementById('inventory-screen').classList.add('hidden');
-            document.getElementById('game-container').classList.remove('hidden');
-            gameActive = true;
-            setInterval(gameTimer, 1000);
-            update();
+        function startTheGame() {
+            document.getElementById('wep-select').classList.add('hidden');
+            document.getElementById('menu-container').classList.add('hidden');
+            document.getElementById('game-view').classList.remove('hidden');
+            // Trigger your game loop here!
         }
-
-        function gameTimer() {
-            if(!gameActive || isCutscene) return;
-            timer--;
-            let m = Math.floor(timer/60), s = timer%60;
-            document.getElementById('timer').innerText = `${m}:${s < 10 ? '0'+s : s}`;
-            if(timer <= 0) {
-                gameActive = false;
-                document.getElementById('game-over').style.display = 'flex';
-                if(!p1.isIt) { stats.wins++; saveStats(); document.getElementById('res-title').innerText = "YOU WON!"; }
-                else { document.getElementById('res-title').innerText = "YOU LOST!"; }
-            }
-        }
-
-        function saveStats() { localStorage.setItem('shibaStats', JSON.stringify(stats)); }
-        function handleChat() { /* Same logic as before */ }
     </script>
 </body>
 </html>
